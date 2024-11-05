@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:17
+    container_name: postgres_db      
+    environment:
+      POSTGRES_USER: postgres 
+      POSTGRES_PASSWORD: root  # Use .env for sensitive info
+    volumes:
+      - C:\\Users\\chava\\postgres_container_bkp:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d  # SQL initialization scripts
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - instagram_network
+
+  instagram_api_con:
+    build:
+      context: .  # Current directory where the Dockerfile is located
+      dockerfile: Dockerfile  # Specify Dockerfile if not named Dockerfile
+    image: instagram-api:v1
+    #container_name: instagram_api_con
+    depends_on:
+      - postgres_db
+    entrypoint: ["java", "-jar", "instagram-backend-api.jar"]
+    ports:
+      - "5454:5454"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/instagram_api_springboot
+      - SPRING_DATASOURCE_USERNAME=postgres 
+      - SPRING_DATASOURCE_PASSWORD=root  
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - instagram_network
+      
+networks:
+  instagram_network:
+    driver: bridge
+    internal: false  # Set to true if you don't need external access
+
+      
+ 
+      
