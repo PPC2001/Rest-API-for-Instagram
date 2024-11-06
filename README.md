@@ -11,3 +11,6 @@ Tools Used -
 7. Spring Security
 8. SpringDoc OpenAPI
 9. Docker
+
+
+Swagger URL : http://localhost:5454/swagger-ui/index.html
